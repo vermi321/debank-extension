@@ -1,0 +1,35 @@
+{
+  "name": "DeBank helper",
+  "version": "1.1",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "DeBank helper",
+    "default_popup": "popups/popup.html",
+    "default_icon": {
+      "32": "icons/32.png",
+      "72": "icons/72.png",
+      "128": "icons/128.png",
+      "512": "icons/512.png"
+    }
+  },
+  "icons": {
+    "32": "icons/32.png",
+    "72": "icons/72.png",
+    "128": "icons/128.png",
+    "512": "icons/512.png"
+  },
+  "permissions": ["scripting", "storage", "activeTab"],
+  "web_accessible_resources": [
+    {
+      "resources": [ "debank.js" ],
+      "matches": [ "https://*.debank.com/*" ]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://*.debank.com/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

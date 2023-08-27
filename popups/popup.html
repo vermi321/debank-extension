@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Document</title>
+    <style>
+        form {
+            width: 500px;
+            padding: 0 10px;
+            display: flex;
+        }
+        .column {
+            flex: 0.9;
+        }
+        .column + .column {
+            flex: 1.1;
+            border-left: 1px solid #eee;
+            padding-left: 20px;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+        }
+        .submit-container {
+            margin: 20px 0;
+        }
+        .say-thank-you {
+            position: absolute;
+            bottom: 28px;
+            left: 20px;
+            text-decoration: none;
+            font-size: 10px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script src="./popup.js"></script>
+</body>
+</html>
