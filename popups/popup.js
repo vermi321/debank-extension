@@ -17,6 +17,9 @@
         let excludeOfficialAccounts = false;
         let excludeNonFollowing = false;
         let excludeReposts = false;
+        let excludeBlacklistedWordsFromFollowing = false;
+        let excludeBlacklistedWordsFromHot = false;
+        let blacklistedWords = [];
 
         try {
             const {config} = await chrome.storage.local.get();
@@ -36,6 +39,18 @@
             if ([true, false].includes(config.excludeReposts)) {
                 excludeReposts = config.excludeReposts;
             }
+
+            if ([true, false].includes(config.excludeBlacklistedWordsFromFollowing)) {
+                excludeBlacklistedWordsFromFollowing = config.excludeBlacklistedWordsFromFollowing;
+            }
+
+            if ([true, false].includes(config.excludeBlacklistedWordsFromHot)) {
+                excludeBlacklistedWordsFromHot = config.excludeBlacklistedWordsFromHot;
+            }
+
+            if (Array.isArray(config.blacklistedWords)) {
+                blacklistedWords = config.blacklistedWords;
+            }
         } catch {
             //
         }
@@ -45,6 +60,9 @@
             excludeOfficialAccounts,
             excludeNonFollowing,
             excludeReposts,
+            excludeBlacklistedWordsFromFollowing,
+            excludeBlacklistedWordsFromHot,
+            blacklistedWords,
         }
     }
 
@@ -67,34 +85,52 @@
         }));
     };
 
+    const showSuccessMessage = () => {
+        const el = window['success-save-container'];
+        el.innerHTML = `Applied! Hard refresh the page for cache reset`;
+    };
+
     window['root'].innerHTML = `
         <form id="hot-stream-settings">
-            <div class="column">
-                <h3>Following stream</h3>
-                <div>
-                    <h4>Exclude posts</h4>
-                    <label><input type="checkbox" name="reposts" ${config.excludeReposts === true ? 'checked' : ''}/>Reposts</label>
+            <div class="columns">
+                <div class="column">
+                    <h3>Following stream</h3>
+                    <div>
+                        <h4>Exclude posts</h4>
+                        <label><input type="checkbox" name="reposts" ${config.excludeReposts === true ? 'checked' : ''}/>Reposts</label>
+                        <label><input type="checkbox" name="blacklist-following" ${config.excludeBlacklistedWordsFromFollowing === true ? 'checked' : ''}/>Containing blacklisted words</label>
+                    </div>
                 </div>
-                <a class="say-thank-you" target="_blank" href="${vermi321ProfileUrl}">
-                    Want to say thank you?<br/>
-                    Just give me a follow
-                </a>
+                <div class="column">
+                    <h3>Hot stream</h3>
+                    <div>
+                        <h4>Sort by</h4>
+                        <label><input type="radio" name="sort-by" value="default" ${config.hotSortBy === HOT_SORT__DEFAULT ? 'checked' : ''}/> Default</label>
+                        <label><input type="radio" name="sort-by" value="created" ${config.hotSortBy === HOT_SORT__CREATED ? 'checked' : ''}/> Created</label>
+                        <label><input type="radio" name="sort-by" value="reward" ${config.hotSortBy === HOT_SORT__REWARD ? 'checked' : ''}/> Reward pool</label>
+                    </div>
+                    <div>
+                        <h4>Exclude posts</h4>
+                        <label><input type="checkbox" name="non-followers" ${config.excludeNonFollowing === true ? 'checked' : ''}/>From users you don't follow</label>
+                        <label><input type="checkbox" name="official-accounts" ${config.excludeOfficialAccounts === true ? 'checked' : ''}/>From official accounts you don't follow</label>
+                        <label><input type="checkbox" name="blacklist-hot" ${config.excludeBlacklistedWordsFromHot === true ? 'checked' : ''}/>Containing blacklisted words</label>
+                    </div>
+                </div>
             </div>
-            <div class="column">
-                <h3>Hot stream</h3>
+            <div>
                 <div>
-                    <h4>Sort by</h4>
-                    <label><input type="radio" name="sort-by" value="default" ${config.hotSortBy === HOT_SORT__DEFAULT ? 'checked' : ''}/> Default</label>
-                    <label><input type="radio" name="sort-by" value="created" ${config.hotSortBy === HOT_SORT__CREATED ? 'checked' : ''}/> Created</label>
-                    <label><input type="radio" name="sort-by" value="reward" ${config.hotSortBy === HOT_SORT__REWARD ? 'checked' : ''}/> Reward pool</label>
+                    <h3>Blacklisted words</h3>
+                    <textarea class="blacklisted-words" name="blacklisted-words" rows="3" placeholder="Provide comma-separated values e.g. friend.tech, friend tech">${config.blacklistedWords.join(', ')}</textarea>
                 </div>
-                <div>
-                    <h4>Exclude posts from</h4>
-                    <label><input type="checkbox" name="non-followers" ${config.excludeNonFollowing === true ? 'checked' : ''}/>Users you don't follow</label>
-                    <label><input type="checkbox" name="official-accounts" ${config.excludeOfficialAccounts === true ? 'checked' : ''}/>Official accounts you don't follow</label>
-                </div>
+            </div>
+            <div>
                 <div class="submit-container">
-                    <button type="submit">Apply</button>
+                    <a class="say-thank-you" target="_blank" href="${vermi321ProfileUrl}">
+                        Want to say thank you?<br/>
+                        Just give me a follow
+                    </a>
+                    <span id="success-save-container" class="success-save-container"></span>
+                    <button class="submit-button" type="submit">Apply</button>
                 </div>
             </div>
         </form>
@@ -109,10 +145,17 @@
             excludeOfficialAccounts: !!formData['official-accounts'],
             excludeNonFollowing: !!formData['non-followers'],
             excludeReposts: !!formData['reposts'],
+            excludeBlacklistedWordsFromFollowing: !!formData['blacklist-following'],
+            excludeBlacklistedWordsFromHot: !!formData['blacklist-hot'],
+            blacklistedWords: formData['blacklisted-words']
+                .split(/,|\r\n|\r|\n/)
+                .map(w => w.trim())
+                .filter(Boolean),
         }
 
         chrome.storage.local.set({config});
         communicateConfigChange(config);
+        showSuccessMessage();
     });
 
 })();

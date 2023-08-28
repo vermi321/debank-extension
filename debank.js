@@ -15,6 +15,9 @@
         let excludeOfficialAccounts = false;
         let excludeNonFollowing = false;
         let excludeReposts = false;
+        let excludeBlacklistedWordsFromFollowing = false;
+        let excludeBlacklistedWordsFromHot = false;
+        let blacklistedWords = [];
 
         try {
             const config = JSON.parse(localStorage.getItem('__debank_extension'));
@@ -34,15 +37,33 @@
             if ([true, false].includes(config.excludeReposts)) {
                 excludeReposts = config.excludeReposts;
             }
+
+            if ([true, false].includes(config.excludeBlacklistedWordsFromFollowing)) {
+                excludeBlacklistedWordsFromFollowing = config.excludeBlacklistedWordsFromFollowing;
+            }
+
+            if ([true, false].includes(config.excludeBlacklistedWordsFromHot)) {
+                excludeBlacklistedWordsFromHot = config.excludeBlacklistedWordsFromHot;
+            }
+
+            if (Array.isArray(config.blacklistedWords)) {
+                blacklistedWords = config.blacklistedWords;
+            }
         } catch {
             //
         }
+
+        const lowerCasedBlacklistedWords = blacklistedWords.map(w => w.toLowerCase());
 
         return {
             hotSortBy,
             excludeOfficialAccounts,
             excludeNonFollowing,
             excludeReposts,
+            excludeBlacklistedWordsFromFollowing,
+            excludeBlacklistedWordsFromHot,
+            blacklistedWords,
+            lowerCasedBlacklistedWords,
         }
     }
 
@@ -63,6 +84,18 @@
 
         if ([true, false].includes(partialConfig.excludeReposts)) {
             newConfig.excludeReposts = partialConfig.excludeReposts;
+        }
+
+        if ([true, false].includes(partialConfig.excludeBlacklistedWordsFromFollowing)) {
+            newConfig.excludeBlacklistedWordsFromFollowing = partialConfig.excludeBlacklistedWordsFromFollowing;
+        }
+
+        if ([true, false].includes(partialConfig.excludeBlacklistedWordsFromHot)) {
+            newConfig.excludeBlacklistedWordsFromHot = partialConfig.excludeBlacklistedWordsFromHot;
+        }
+
+        if (Array.isArray(partialConfig.blacklistedWords)) {
+            newConfig.blacklistedWords = partialConfig.blacklistedWords;
         }
 
         localStorage.setItem('__debank_extension', JSON.stringify(newConfig))
@@ -86,7 +119,13 @@
 
     const modifyHotResponse = (response) => {
         return swapRequestResult(response, result => {
-            const {hotSortBy, excludeOfficialAccounts, excludeNonFollowing} = getConfig();
+            const {
+                hotSortBy,
+                excludeOfficialAccounts,
+                excludeNonFollowing,
+                excludeBlacklistedWordsFromHot,
+                lowerCasedBlacklistedWords,
+            } = getConfig();
 
             result.data.feeds.sort((a, b) => {
                 switch (hotSortBy) {
@@ -104,6 +143,13 @@
                 data: {
                     ...result.data,
                     feeds: result.data.feeds.filter(feed => {
+                        if (excludeBlacklistedWordsFromHot) {
+                            const content = feed.article.content.toLowerCase();
+                            if (lowerCasedBlacklistedWords.some(word => content.includes(word))) {
+                                return false;
+                            }
+                        }
+
                         if (excludeOfficialAccounts && typeof feed.article.creator.verify_status === 'number') {
                             return feed.article.creator.is_following;
                         }
@@ -121,15 +167,31 @@
 
     const modifyFollowingResponse = (response) => {
         return swapRequestResult(response, result => {
-            const {excludeReposts} = getConfig();
-            return !excludeReposts ? result : {
+            const {
+                excludeReposts,
+                excludeBlacklistedWordsFromFollowing,
+                lowerCasedBlacklistedWords,
+            } = getConfig();
+
+            return {
                 ...result,
                 data: {
                     ...result.data,
                     feeds: result.data.feeds.map(feed => {
-                        return feed.repost_list.length === 0
-                            ? feed
-                            : {article: {}}
+                        if (excludeBlacklistedWordsFromFollowing) {
+                            const content = feed.article.content.toLowerCase();
+                            if (lowerCasedBlacklistedWords.some(word => content.includes(word))) {
+                                return {article: {}};
+                            }
+                        }
+
+                        if (excludeReposts) {
+                            if (feed.repost_list.length > 0) {
+                                return {article: {}};
+                            }
+                        }
+
+                        return feed;
                     })
                 }
             }
@@ -156,16 +218,6 @@
 
     document.body.addEventListener('__debank_extension', (e) => {
         setConfig(e.detail.config);
-
-        if ([
-            'https://debank.com/stream',
-            'https://debank.com/stream?tab=hot',
-            'https://debank.com/stream?tab=following'
-        ].includes(window.location.href)) {
-            setTimeout(() => {
-                window.location.reload();
-            }, 100);
-        }
     });
 
 })();
