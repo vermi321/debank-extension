@@ -119,7 +119,7 @@
             </div>
             <div>
                 <div>
-                    <h3>Blacklisted words</h3>
+                    <h4>Blacklisted words</h4>
                     <textarea class="blacklisted-words" name="blacklisted-words" rows="3" placeholder="Provide comma-separated values e.g. friend.tech, friend tech">${config.blacklistedWords.join(', ')}</textarea>
                 </div>
             </div>
