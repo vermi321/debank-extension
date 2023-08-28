@@ -6,9 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Document</title>
     <style>
+        body {
+            background-color: #eff3f8;
+        }
         form {
             width: 500px;
             padding: 0 10px;
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 6px;
+            box-shadow: 0 3px 8px 0 #0000000d;
         }
         .columns {
             display: flex;
@@ -33,6 +40,9 @@
             font-family: monospace;
             font-size: 12px;
             resize: vertical;
+            color: #19233c;
+            background-color: #f7f8fa;
+            border-radius: 4px;
         }
         .submit-container {
             margin: 20px 0;
@@ -40,6 +50,17 @@
         }
         .submit-button {
             flex: 1;
+            color: #fff;
+            background-color: #fe815f;
+            border-color: #fe815f;
+            overflow: hidden;
+            position: relative;
+            border-radius: 9999px;
+            border: 1px solid transparent;
+            text-align: center;
+            transition: all .3s ease-in-out;
+            font-size: 14px;
+            box-sizing: border-box;
         }
         .success-save-container {
             flex: 2;
@@ -53,6 +74,15 @@
             text-decoration: none;
             font-size: 10px;
             color: #777;
+        }
+
+        body.dark-theme { 
+            background-color: #252a37;
+            color: #dfdfdf;
+        }
+        .dark-theme form {
+            background-color: #2e3343;
+            box-shadow: 0 3px 8px 0 #0000000d;
         }
     </style>
 </head>
