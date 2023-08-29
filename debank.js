@@ -100,6 +100,23 @@
         localStorage.setItem('__debank_extension', JSON.stringify(newConfig))
     }
 
+    const shouldBeBlacklisted = (article, lowerCasedBlacklistedWords) => {
+        const content = article.content.toLowerCase();
+        const isLuckyDrawBlacklisted =
+            lowerCasedBlacklistedWords.includes('lucky draw') ||
+            lowerCasedBlacklistedWords.includes('luckydraw');
+
+        if (isLuckyDrawBlacklisted && article.type === 'draw') {
+            return true;
+        }
+
+        if (lowerCasedBlacklistedWords.some(word => content.includes(word))) {
+            return true;
+        }
+
+        return false;
+    }
+
     const swapRequestResult = (response, transformResponseFn) => {
         response.json = () =>
             response
@@ -143,8 +160,7 @@
                     ...result.data,
                     feeds: result.data.feeds.filter(feed => {
                         if (excludeBlacklistedWordsFromHot) {
-                            const content = feed.article.content.toLowerCase();
-                            if (lowerCasedBlacklistedWords.some(word => content.includes(word))) {
+                            if (shouldBeBlacklisted(feed.article, lowerCasedBlacklistedWords)) {
                                 return false;
                             }
                         }
@@ -178,8 +194,7 @@
                     ...result.data,
                     feeds: result.data.feeds.map(feed => {
                         if (excludeBlacklistedWordsFromFollowing) {
-                            const content = feed.article.content.toLowerCase();
-                            if (lowerCasedBlacklistedWords.some(word => content.includes(word))) {
+                            if (shouldBeBlacklisted(feed.article, lowerCasedBlacklistedWords)) {
                                 return {article: {}};
                             }
                         }
