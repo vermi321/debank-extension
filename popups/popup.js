@@ -3,14 +3,54 @@
     const HOT_SORT__DEFAULT = 'default';
     const HOT_SORT__CREATED = 'created';
     const HOT_SORT__REWARD = 'reward';
-
     const HOT_SORT_OPTIONS = [
         HOT_SORT__DEFAULT,
         HOT_SORT__CREATED,
         HOT_SORT__REWARD,
     ];
 
+    const THEME_DEFAULT = 'default'
+    const THEME_DARK = 'dark'
+    const THEMES = [
+        THEME_DEFAULT,
+        THEME_DARK,
+    ]
+
     const vermi321ProfileUrl = 'https://debank.com/profile/0x4c81c1d6fb83f063ccc7eb50400569bf830b5492?t=1692901643019&r=77271';
+
+    const applyTheme = async () => {
+        let theme = await new Promise(res => {
+            chrome.tabs.query({active: true, currentWindow: true}, async (tabs) => {
+                const {id, url} = tabs[0];
+                if (new URL(url).hostname === 'debank.com') {
+                    chrome.scripting
+                        .executeScript({
+                            target: {tabId: id},
+                            func: () => document.documentElement.getAttribute('theme'),
+                        })
+                        .then(injectionResults =>
+                            Array.from(injectionResults).find(r => r.result === THEME_DARK)
+                                ? res(THEME_DARK)
+                                : res(THEME_DEFAULT)
+                        )
+                        .catch(res);
+                } else {
+                    res();
+                }
+            });
+        });
+
+        if (!THEMES.includes(theme)) {
+            theme = (await chrome.storage.local.get()).theme;
+        }
+
+        if (!THEMES.includes(theme)) {
+            theme = THEME_DEFAULT;
+        }
+
+        document.documentElement.setAttribute('theme', theme);
+        chrome.storage.local.set({theme});
+    }
 
     const getConfig = async () => {
         let hotSortBy = HOT_SORT__DEFAULT;
@@ -90,6 +130,8 @@
         el.innerHTML = `Applied! Hard refresh the page for cache reset`;
     };
 
+    await applyTheme();
+
     window['root'].innerHTML = `
         <form id="hot-stream-settings">
             <div class="columns">
@@ -119,7 +161,7 @@
             </div>
             <div>
                 <div>
-                    <h3>Blacklisted words</h3>
+                    <h4>Blacklisted words</h4>
                     <textarea class="blacklisted-words" name="blacklisted-words" rows="3" placeholder="Provide comma-separated values e.g. friend.tech, friend tech">${config.blacklistedWords.join(', ')}</textarea>
                 </div>
             </div>

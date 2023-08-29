@@ -3,7 +3,6 @@
     const HOT_SORT__DEFAULT = 'default';
     const HOT_SORT__CREATED = 'created';
     const HOT_SORT__REWARD = 'reward';
-
     const HOT_SORT_OPTIONS = [
         HOT_SORT__DEFAULT,
         HOT_SORT__CREATED,
