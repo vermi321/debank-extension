@@ -1,6 +1,6 @@
 {
   "name": "DeBank helper",
-  "version": "1.3",
+  "version": "1.4",
   "manifest_version": 3,
   "action": {
     "default_title": "DeBank helper",
@@ -29,6 +29,7 @@
     {
       "matches": ["https://*.debank.com/*"],
       "js": ["content-script.js"],
+      "css": ["debank.css"],
       "run_at": "document_start"
     }
   ]

@@ -1,3 +1,7 @@
+## 1.4 (2023-09-03)
+
+* Open stream in a new tab when the history cell is clicked
+
 ## 1.3 (2023-08-29)
 
 * Added dark mode for popup and UI tweaks.

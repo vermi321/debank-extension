@@ -1,0 +1,3 @@
+[class*="AccountHistory_mainTable__"] .db-table-row {
+    cursor: pointer;
+}
