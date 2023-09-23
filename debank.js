@@ -14,6 +14,8 @@
         let excludeOfficialAccounts = false;
         let excludeNonFollowing = false;
         let excludeReposts = false;
+        let excludePaidPostsFromFollowing = false;
+        let excludePaidPostsFromHot = false;
         let excludeBlacklistedWordsFromFollowing = false;
         let excludeBlacklistedWordsFromHot = false;
         let blacklistedWords = [];
@@ -35,6 +37,14 @@
 
             if ([true, false].includes(config.excludeReposts)) {
                 excludeReposts = config.excludeReposts;
+            }
+
+            if ([true, false].includes(config.excludePaidPostsFromFollowing)) {
+                excludePaidPostsFromFollowing = config.excludePaidPostsFromFollowing;
+            }
+
+            if ([true, false].includes(config.excludePaidPostsFromHot)) {
+                excludePaidPostsFromHot = config.excludePaidPostsFromHot;
             }
 
             if ([true, false].includes(config.excludeBlacklistedWordsFromFollowing)) {
@@ -59,6 +69,8 @@
             excludeOfficialAccounts,
             excludeNonFollowing,
             excludeReposts,
+            excludePaidPostsFromFollowing,
+            excludePaidPostsFromHot,
             excludeBlacklistedWordsFromFollowing,
             excludeBlacklistedWordsFromHot,
             blacklistedWords,
@@ -83,6 +95,14 @@
 
         if ([true, false].includes(partialConfig.excludeReposts)) {
             newConfig.excludeReposts = partialConfig.excludeReposts;
+        }
+
+        if ([true, false].includes(partialConfig.excludePaidPostsFromFollowing)) {
+            newConfig.excludePaidPostsFromFollowing = partialConfig.excludePaidPostsFromFollowing;
+        }
+
+        if ([true, false].includes(partialConfig.excludePaidPostsFromHot)) {
+            newConfig.excludePaidPostsFromHot = partialConfig.excludePaidPostsFromHot;
         }
 
         if ([true, false].includes(partialConfig.excludeBlacklistedWordsFromFollowing)) {
@@ -139,6 +159,7 @@
                 hotSortBy,
                 excludeOfficialAccounts,
                 excludeNonFollowing,
+                excludePaidPostsFromHot,
                 excludeBlacklistedWordsFromHot,
                 lowerCasedBlacklistedWords,
             } = getConfig();
@@ -158,23 +179,40 @@
                 ...result,
                 data: {
                     ...result.data,
-                    feeds: result.data.feeds.filter(feed => {
-                        if (excludeBlacklistedWordsFromHot) {
-                            if (shouldBeBlacklisted(feed.article, lowerCasedBlacklistedWords)) {
-                                return false;
+                    feeds: result.data.feeds
+                        .filter(feed => {
+                            if (excludeBlacklistedWordsFromHot) {
+                                if (shouldBeBlacklisted(feed.article, lowerCasedBlacklistedWords)) {
+                                    return false;
+                                }
                             }
-                        }
 
-                        if (excludeOfficialAccounts && typeof feed.article.creator.verify_status === 'number') {
-                            return feed.article.creator.is_following;
-                        }
+                            if (excludeOfficialAccounts) {
+                                if (
+                                    typeof feed.article.creator.verify_status === 'number' &&
+                                    !feed.article.creator.is_following
+                                ) {
+                                    return false;
+                                }
+                            }
 
-                        if (excludeNonFollowing) {
-                            return feed.article.creator.is_following;
-                        }
+                            if (excludeNonFollowing) {
+                                if (!feed.article.creator.is_following) {
+                                    return false;
+                                }
+                            }
 
-                        return true;
-                    })
+                            if (excludePaidPostsFromHot) {
+                                if (feed.article.price && !feed.article.is_paid) {
+                                    return false;
+                                }
+                            }
+
+                            return true;
+                        })
+                        .map(feed => {
+                            return feed;
+                        })
                 }
             }
         });
@@ -184,6 +222,7 @@
         return swapRequestResult(response, result => {
             const {
                 excludeReposts,
+                excludePaidPostsFromFollowing,
                 excludeBlacklistedWordsFromFollowing,
                 lowerCasedBlacklistedWords,
             } = getConfig();
@@ -201,6 +240,12 @@
 
                         if (excludeReposts) {
                             if (feed.repost_list.length > 0) {
+                                return {article: {}};
+                            }
+                        }
+
+                        if (excludePaidPostsFromFollowing) {
+                            if (feed.article.price && !feed.article.is_paid) {
                                 return {article: {}};
                             }
                         }

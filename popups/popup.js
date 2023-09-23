@@ -57,6 +57,8 @@
         let excludeOfficialAccounts = false;
         let excludeNonFollowing = false;
         let excludeReposts = false;
+        let excludePaidPostsFromFollowing = false;
+        let excludePaidPostsFromHot = false;
         let excludeBlacklistedWordsFromFollowing = false;
         let excludeBlacklistedWordsFromHot = false;
         let blacklistedWords = [];
@@ -80,6 +82,14 @@
                 excludeReposts = config.excludeReposts;
             }
 
+            if ([true, false].includes(config.excludePaidPostsFromFollowing)) {
+                excludePaidPostsFromFollowing = config.excludePaidPostsFromFollowing;
+            }
+
+            if ([true, false].includes(config.excludePaidPostsFromHot)) {
+                excludePaidPostsFromHot = config.excludePaidPostsFromHot;
+            }
+
             if ([true, false].includes(config.excludeBlacklistedWordsFromFollowing)) {
                 excludeBlacklistedWordsFromFollowing = config.excludeBlacklistedWordsFromFollowing;
             }
@@ -100,6 +110,8 @@
             excludeOfficialAccounts,
             excludeNonFollowing,
             excludeReposts,
+            excludePaidPostsFromFollowing,
+            excludePaidPostsFromHot,
             excludeBlacklistedWordsFromFollowing,
             excludeBlacklistedWordsFromHot,
             blacklistedWords,
@@ -141,6 +153,7 @@
                         <h4>Exclude posts</h4>
                         <label><input type="checkbox" name="reposts" ${config.excludeReposts === true ? 'checked' : ''}/>Reposts</label>
                         <label><input type="checkbox" name="blacklist-following" ${config.excludeBlacklistedWordsFromFollowing === true ? 'checked' : ''}/>Containing blacklisted words</label>
+                        <label><input type="checkbox" name="paid-following" ${config.excludePaidPostsFromFollowing === true ? 'checked' : ''}/>Paid</label>
                     </div>
                 </div>
                 <div class="column">
@@ -156,6 +169,7 @@
                         <label><input type="checkbox" name="non-followers" ${config.excludeNonFollowing === true ? 'checked' : ''}/>From users you don't follow</label>
                         <label><input type="checkbox" name="official-accounts" ${config.excludeOfficialAccounts === true ? 'checked' : ''}/>From official accounts you don't follow</label>
                         <label><input type="checkbox" name="blacklist-hot" ${config.excludeBlacklistedWordsFromHot === true ? 'checked' : ''}/>Containing blacklisted words</label>
+                        <label><input type="checkbox" name="paid-hot" ${config.excludePaidPostsFromHot === true ? 'checked' : ''}/>Paid</label>
                     </div>
                 </div>
             </div>
@@ -182,11 +196,14 @@
         e.preventDefault();
 
         const formData = Object.fromEntries(new FormData(e.target));
+
         const config = {
             hotSortBy: formData['sort-by'],
             excludeOfficialAccounts: !!formData['official-accounts'],
             excludeNonFollowing: !!formData['non-followers'],
             excludeReposts: !!formData['reposts'],
+            excludePaidPostsFromFollowing: !!formData['paid-following'],
+            excludePaidPostsFromHot: !!formData['paid-hot'],
             excludeBlacklistedWordsFromFollowing: !!formData['blacklist-following'],
             excludeBlacklistedWordsFromHot: !!formData['blacklist-hot'],
             blacklistedWords: formData['blacklisted-words']

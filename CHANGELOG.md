@@ -1,3 +1,7 @@
+## 1.5.1 (2023-09-23)
+
+* Added possibility to exclude paid posts
+
 ## 1.4 (2023-09-03)
 
 * Open stream in a new tab when the history cell is clicked
