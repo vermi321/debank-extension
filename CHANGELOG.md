@@ -1,3 +1,7 @@
+## 1.6 (2023-10-03)
+
+* Open posts in a new tab using Cmd/Ctrl + click
+
 ## 1.5.1 (2023-09-23)
 
 * Added possibility to exclude paid posts

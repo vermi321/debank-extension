@@ -1,6 +1,6 @@
 {
   "name": "DeBank helper",
-  "version": "1.5.2",
+  "version": "1.6",
   "manifest_version": 3,
   "action": {
     "default_title": "DeBank helper",
