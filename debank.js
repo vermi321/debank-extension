@@ -234,6 +234,17 @@
                         }
                     }
 
+                    // Hide posts from sybils without any settings
+                    if (
+                        feed.article.creator.desc.is_danger ||
+                        feed.article.creator.desc.is_restricted ||
+                        feed.article.creator.desc.is_scam ||
+                        feed.article.creator.desc.is_spam ||
+                        feed.article.creator.desc.is_muted
+                    ) {
+                        return false;
+                    }
+
                     return true;
                 })
                 .map(feed => {

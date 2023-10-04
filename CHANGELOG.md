@@ -1,3 +1,7 @@
+## 1.7 (2023-10-04)
+
+* Hide posts from suspicious users on the Hot stream - sybils, scammers, spammers, muted and restricted
+
 ## 1.6 (2023-10-03)
 
 * Open posts in a new tab using Cmd/Ctrl + click
