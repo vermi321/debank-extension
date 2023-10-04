@@ -1,3 +1,7 @@
+## 1.7.1 (2023-10-04)
+
+* Fix the issue with Cmd/Ctrl + click on the link - now the extension lets DeBank process the click instead of opening the post itself
+
 ## 1.7 (2023-10-04)
 
 * Hide posts from suspicious users on the Hot stream - sybils, scammers, spammers, muted and restricted

@@ -382,6 +382,9 @@
         document.addEventListener('click', e => {
             if (!e.metaKey && !e.ctrlKey) return;
 
+            // clicking the link in the post, we let DeBank process it
+            if (typeof e.target.dataset.target === 'string') return;
+
             let streamType = getCurrentStreamType();
             let closestStreamItem;
             if (
