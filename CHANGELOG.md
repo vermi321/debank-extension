@@ -1,6 +1,7 @@
-## 1.7.1 (2023-10-04)
+## 1.7.2 (2023-10-04)
 
 * Fix the issue with Cmd/Ctrl + click on the link - now the extension lets DeBank process the click instead of opening the post itself
+* Fix the bug - not all users have a `desc` object
 
 ## 1.7 (2023-10-04)
 

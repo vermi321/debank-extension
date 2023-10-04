@@ -207,49 +207,54 @@
 
             const feeds = result.data.feeds
                 .filter(feed => {
+                    const {article} = feed;
+                    const {creator} = article;
+
                     if (excludeBlacklistedWordsFromHot) {
-                        if (shouldBeBlacklisted(feed.article, lowerCasedBlacklistedWords)) {
+                        if (shouldBeBlacklisted(article, lowerCasedBlacklistedWords)) {
                             return false;
                         }
                     }
 
                     if (excludeOfficialAccounts) {
                         if (
-                            typeof feed.article.creator.verify_status === 'number' &&
-                            !feed.article.creator.is_following
+                            typeof creator.verify_status === 'number' &&
+                            !creator.is_following
                         ) {
                             return false;
                         }
                     }
 
                     if (excludeNonFollowing) {
-                        if (!feed.article.creator.is_following) {
+                        if (!creator.is_following) {
                             return false;
                         }
                     }
 
                     if (excludePaidPostsFromHot) {
-                        if (feed.article.price && !feed.article.is_paid) {
+                        if (article.price && !article.is_paid) {
                             return false;
                         }
                     }
 
                     // Hide posts from sybils without any settings
-                    if (
-                        feed.article.creator.desc.is_danger ||
-                        feed.article.creator.desc.is_restricted ||
-                        feed.article.creator.desc.is_scam ||
-                        feed.article.creator.desc.is_spam ||
-                        feed.article.creator.desc.is_muted
-                    ) {
-                        return false;
+                    if (creator.desc) {
+                        if (
+                            creator.desc.is_danger ||
+                            creator.desc.is_restricted ||
+                            creator.desc.is_scam ||
+                            creator.desc.is_spam ||
+                            creator.desc.is_muted
+                        ) {
+                            return false;
+                        }
                     }
 
                     return true;
                 })
                 .map(feed => {
                     return feed;
-                })
+                });
 
             saveMostRecentFeeds(response.url, STREAM_HOT, feeds);
 
