@@ -1,3 +1,8 @@
+## 1.8 (2023-11-16)
+
+* Do not show comments from dangerous/muted accounts
+* Allow hiding posts with empty reward pools
+
 ## 1.7.2 (2023-10-04)
 
 * Fix the issue with Cmd/Ctrl + click on the link - now the extension lets DeBank process the click instead of opening the post itself
