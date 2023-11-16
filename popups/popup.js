@@ -165,7 +165,7 @@
                         <h4>Exclude posts</h4>
                         <label><input type="checkbox" name="reposts" ${config.excludeReposts === true ? 'checked' : ''}/>Reposts</label>
                         <label><input type="checkbox" name="blacklist-following" ${config.excludeBlacklistedWordsFromFollowing === true ? 'checked' : ''}/>Containing blacklisted words</label>
-                        <label><input type="checkbox" name="empty-reward-pool-following" ${config.excludeEmptyRewardPoolsFromFollowing === true ? 'checked' : ''}/>Empty reward pools</label>
+                        <label><input type="checkbox" name="empty-reward-pool-following" ${config.excludeEmptyRewardPoolsFromFollowing === true ? 'checked' : ''}/>With empty reward pools</label>
                         <label><input type="checkbox" name="paid-following" ${config.excludePaidPostsFromFollowing === true ? 'checked' : ''}/>Paid</label>
                     </div>
                 </div>
@@ -182,7 +182,7 @@
                         <label><input type="checkbox" name="non-followers" ${config.excludeNonFollowing === true ? 'checked' : ''}/>From users you don't follow</label>
                         <label><input type="checkbox" name="official-accounts" ${config.excludeOfficialAccounts === true ? 'checked' : ''}/>From official accounts you don't follow</label>
                         <label><input type="checkbox" name="blacklist-hot" ${config.excludeBlacklistedWordsFromHot === true ? 'checked' : ''}/>Containing blacklisted words</label>
-                        <label><input type="checkbox" name="empty-reward-pool-hot" ${config.excludeEmptyRewardPoolsFromHot === true ? 'checked' : ''}/>Empty reward pools</label>
+                        <label><input type="checkbox" name="empty-reward-pool-hot" ${config.excludeEmptyRewardPoolsFromHot === true ? 'checked' : ''}/>With empty reward pools</label>
                         <label><input type="checkbox" name="paid-hot" ${config.excludePaidPostsFromHot === true ? 'checked' : ''}/>Paid</label>
                     </div>
                 </div>

@@ -375,6 +375,35 @@
         });
     }
 
+    const modifyCommentsResponse = (response) => {
+        return swapRequestResult(response, result => {
+            return {
+                ...result,
+                data: {
+                    ...result.data,
+                    comments: result.data.comments
+                        .map(comment => {
+                            const {creator: {type, desc}} = comment;
+                            const shouldMute = type === 'user' && desc && (
+                                desc.is_danger ||
+                                desc.is_muted ||
+                                desc.is_restricted ||
+                                desc.is_scam ||
+                                desc.is_spam
+                            )
+
+                            if (shouldMute) {
+                                return null;
+                            }
+
+                            return comment;
+                        })
+                        .filter(Boolean)
+                }
+            }
+        });
+    }
+
     const tweakResponses = () => {
         const rawFetch = window.fetch;
         window.fetch = async (...args) => {
@@ -391,6 +420,8 @@
                 return modifyRepostListResponse(response);
             } else if (url.startsWith('https://api.debank.com/feed/search')) {
                 return modifySearchResponse(response);
+            } else if (url.startsWith('https://api.debank.com/article/comments')) {
+                return modifyCommentsResponse(response);
             }
 
             return response;
