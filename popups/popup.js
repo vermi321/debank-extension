@@ -59,6 +59,8 @@
         let excludeReposts = false;
         let excludePaidPostsFromFollowing = false;
         let excludePaidPostsFromHot = false;
+        let excludeEmptyRewardPoolsFromFollowing = false;
+        let excludeEmptyRewardPoolsFromHot = false;
         let excludeBlacklistedWordsFromFollowing = false;
         let excludeBlacklistedWordsFromHot = false;
         let blacklistedWords = [];
@@ -90,6 +92,14 @@
                 excludePaidPostsFromHot = config.excludePaidPostsFromHot;
             }
 
+            if ([true, false].includes(config.excludeEmptyRewardPoolsFromFollowing)) {
+                excludeEmptyRewardPoolsFromFollowing = config.excludeEmptyRewardPoolsFromFollowing;
+            }
+
+            if ([true, false].includes(config.excludeEmptyRewardPoolsFromHot)) {
+                excludeEmptyRewardPoolsFromHot = config.excludeEmptyRewardPoolsFromHot;
+            }
+
             if ([true, false].includes(config.excludeBlacklistedWordsFromFollowing)) {
                 excludeBlacklistedWordsFromFollowing = config.excludeBlacklistedWordsFromFollowing;
             }
@@ -112,6 +122,8 @@
             excludeReposts,
             excludePaidPostsFromFollowing,
             excludePaidPostsFromHot,
+            excludeEmptyRewardPoolsFromFollowing,
+            excludeEmptyRewardPoolsFromHot,
             excludeBlacklistedWordsFromFollowing,
             excludeBlacklistedWordsFromHot,
             blacklistedWords,
@@ -153,6 +165,7 @@
                         <h4>Exclude posts</h4>
                         <label><input type="checkbox" name="reposts" ${config.excludeReposts === true ? 'checked' : ''}/>Reposts</label>
                         <label><input type="checkbox" name="blacklist-following" ${config.excludeBlacklistedWordsFromFollowing === true ? 'checked' : ''}/>Containing blacklisted words</label>
+                        <label><input type="checkbox" name="empty-reward-pool-following" ${config.excludeEmptyRewardPoolsFromFollowing === true ? 'checked' : ''}/>Empty reward pools</label>
                         <label><input type="checkbox" name="paid-following" ${config.excludePaidPostsFromFollowing === true ? 'checked' : ''}/>Paid</label>
                     </div>
                 </div>
@@ -169,6 +182,7 @@
                         <label><input type="checkbox" name="non-followers" ${config.excludeNonFollowing === true ? 'checked' : ''}/>From users you don't follow</label>
                         <label><input type="checkbox" name="official-accounts" ${config.excludeOfficialAccounts === true ? 'checked' : ''}/>From official accounts you don't follow</label>
                         <label><input type="checkbox" name="blacklist-hot" ${config.excludeBlacklistedWordsFromHot === true ? 'checked' : ''}/>Containing blacklisted words</label>
+                        <label><input type="checkbox" name="empty-reward-pool-hot" ${config.excludeEmptyRewardPoolsFromHot === true ? 'checked' : ''}/>Empty reward pools</label>
                         <label><input type="checkbox" name="paid-hot" ${config.excludePaidPostsFromHot === true ? 'checked' : ''}/>Paid</label>
                     </div>
                 </div>
@@ -204,6 +218,8 @@
             excludeReposts: !!formData['reposts'],
             excludePaidPostsFromFollowing: !!formData['paid-following'],
             excludePaidPostsFromHot: !!formData['paid-hot'],
+            excludeEmptyRewardPoolsFromFollowing: !!formData['empty-reward-pool-following'],
+            excludeEmptyRewardPoolsFromHot: !!formData['empty-reward-pool-hot'],
             excludeBlacklistedWordsFromFollowing: !!formData['blacklist-following'],
             excludeBlacklistedWordsFromHot: !!formData['blacklist-hot'],
             blacklistedWords: formData['blacklisted-words']

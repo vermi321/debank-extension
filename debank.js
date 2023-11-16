@@ -30,6 +30,8 @@
         let excludeReposts = false;
         let excludePaidPostsFromFollowing = false;
         let excludePaidPostsFromHot = false;
+        let excludeEmptyRewardPoolsFromFollowing = false;
+        let excludeEmptyRewardPoolsFromHot = false;
         let excludeBlacklistedWordsFromFollowing = false;
         let excludeBlacklistedWordsFromHot = false;
         let blacklistedWords = [];
@@ -61,6 +63,14 @@
                 excludePaidPostsFromHot = config.excludePaidPostsFromHot;
             }
 
+            if ([true, false].includes(config.excludeEmptyRewardPoolsFromFollowing)) {
+                excludeEmptyRewardPoolsFromFollowing = config.excludeEmptyRewardPoolsFromFollowing;
+            }
+
+            if ([true, false].includes(config.excludeEmptyRewardPoolsFromHot)) {
+                excludeEmptyRewardPoolsFromHot = config.excludeEmptyRewardPoolsFromHot;
+            }
+
             if ([true, false].includes(config.excludeBlacklistedWordsFromFollowing)) {
                 excludeBlacklistedWordsFromFollowing = config.excludeBlacklistedWordsFromFollowing;
             }
@@ -85,6 +95,8 @@
             excludeReposts,
             excludePaidPostsFromFollowing,
             excludePaidPostsFromHot,
+            excludeEmptyRewardPoolsFromFollowing,
+            excludeEmptyRewardPoolsFromHot,
             excludeBlacklistedWordsFromFollowing,
             excludeBlacklistedWordsFromHot,
             blacklistedWords,
@@ -117,6 +129,14 @@
 
         if ([true, false].includes(partialConfig.excludePaidPostsFromHot)) {
             newConfig.excludePaidPostsFromHot = partialConfig.excludePaidPostsFromHot;
+        }
+
+        if ([true, false].includes(partialConfig.excludeEmptyRewardPoolsFromFollowing)) {
+            newConfig.excludeEmptyRewardPoolsFromFollowing = partialConfig.excludeEmptyRewardPoolsFromFollowing;
+        }
+
+        if ([true, false].includes(partialConfig.excludeEmptyRewardPoolsFromHot)) {
+            newConfig.excludeEmptyRewardPoolsFromHot = partialConfig.excludeEmptyRewardPoolsFromHot;
         }
 
         if ([true, false].includes(partialConfig.excludeBlacklistedWordsFromFollowing)) {
@@ -190,6 +210,7 @@
                 excludeOfficialAccounts,
                 excludeNonFollowing,
                 excludePaidPostsFromHot,
+                excludeEmptyRewardPoolsFromHot,
                 excludeBlacklistedWordsFromHot,
                 lowerCasedBlacklistedWords,
             } = getConfig();
@@ -237,6 +258,12 @@
                         }
                     }
 
+                    if (excludeEmptyRewardPoolsFromHot) {
+                        if (!(article.reward_usd_value > 0)) {
+                            return false;
+                        }
+                    }
+
                     // Hide posts from sybils without any settings
                     if (creator.desc) {
                         if (
@@ -273,26 +300,42 @@
             const {
                 excludeReposts,
                 excludePaidPostsFromFollowing,
+                excludeEmptyRewardPoolsFromFollowing,
                 excludeBlacklistedWordsFromFollowing,
                 lowerCasedBlacklistedWords,
             } = getConfig();
 
-            const feeds = result.data.feeds.map(feed => {
+            const feeds = result.data.feeds.map((feed, index, array) => {
+                // Return a broken article so it is excluded from the list
+                // Must keep timestamps, otherwise the pagination breaks
+                const brokenArticle = {
+                    create_at: feed.create_at,
+                    article: {
+                        create_at: feed.article.create_at,
+                    }
+                };
+
                 if (excludeBlacklistedWordsFromFollowing) {
                     if (shouldBeBlacklisted(feed.article, lowerCasedBlacklistedWords)) {
-                        return {article: {}};
+                        return brokenArticle;
                     }
                 }
 
                 if (excludeReposts) {
                     if (feed.repost_list.length > 0) {
-                        return {article: {}};
+                        return brokenArticle;
                     }
                 }
 
                 if (excludePaidPostsFromFollowing) {
                     if (feed.article.price && !feed.article.is_paid) {
-                        return {article: {}};
+                        return brokenArticle;
+                    }
+                }
+
+                if (excludeEmptyRewardPoolsFromFollowing) {
+                    if (!(feed.article.reward_usd_value > 0)) {
+                        return brokenArticle;
                     }
                 }
 
